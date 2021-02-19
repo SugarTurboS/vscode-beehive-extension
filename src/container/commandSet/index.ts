@@ -3,6 +3,12 @@ import SideBarCommand from './SideBarCommand'
 import { ShellType } from '../../type/common'
 import { getWorkSpaceFolderList } from '../../utils'
 import { PREFIX, MATCH_CONFIG_MAPS } from '../../constants'
+import { StatusBarTerminal } from './StatusBarTerminal'
+
+const MAX_TERMINALS = 10
+let terminals: StatusBarTerminal[] = [];
+let terminalCount = 0;
+let terminalIndex:number;
 
 module.exports = function (context: vscode.ExtensionContext) {
   // 得到vscode所有工程项目
@@ -16,7 +22,7 @@ module.exports = function (context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     'BeeHive-Command.openChild',
     (args: { title: string; shell: ShellType; [key: string]: any }) => {
-      const { title, shell = null, path = '' } = args
+      const { title, shell = null, path = '', projectName } = args
       const reg = new RegExp(`${PREFIX}`)
       if (reg.test(title)) {
         vscode.window.showErrorMessage(title)
@@ -29,14 +35,51 @@ module.exports = function (context: vscode.ExtensionContext) {
           vscode.window.showInformationMessage(`fine ! shell copied to clipboard ~`)
         } else if (matchConfig === MATCH_CONFIG_MAPS.MIDDLE) {
           // 中配：打开终端，跳转当前项目，不自动运行
-          console.log('中配')
+          if (terminals.length >= MAX_TERMINALS) {
+            vscode.window.showInformationMessage(`${PREFIX} does not support more than ${MAX_TERMINALS} terminals.`);
+            return;
+          }
+          terminals.push(new StatusBarTerminal(terminalCount++, {
+            terminalCwd: path,
+            terminalName: projectName,
+            terminalText: `npm run ${shell?.key}`,
+            terminalAutoInputText: true,
+            terminalAutoRun: false
+          }))
+          context.subscriptions.push(vscode.window.onDidCloseTerminal(onDidCloseTerminal))
         } else if (matchConfig === MATCH_CONFIG_MAPS.HIGH) {
           // 高配：支持分屏、自动运行项目、多项目终端切换
-          console.log('高配')
+          if (terminals.length >= MAX_TERMINALS) {
+            vscode.window.showInformationMessage(`${PREFIX} does not support more than ${MAX_TERMINALS} terminals.`);
+            return;
+          }
+          terminals.push(new StatusBarTerminal(terminalCount++, {
+            terminalCwd: path,
+            terminalName: projectName,
+            terminalText: `npm run ${shell?.key}`,
+            terminalAutoInputText: true,
+            terminalAutoRun: true
+          }))
+          context.subscriptions.push(vscode.window.onDidCloseTerminal(onDidCloseTerminal))
         } else {
           vscode.window.showErrorMessage(`unknown error`)
         }
       }
     }
   )
+}
+
+
+function onDidCloseTerminal(terminal: vscode.Terminal): void {
+  terminals.forEach((statusBarTerminal, index) => {
+    if (statusBarTerminal.hasTerminal(terminal)) {
+      terminalIndex = index;
+    }
+  })
+  terminals[terminalIndex].dispose();
+  terminals.splice(terminalIndex, 1);
+  terminals.forEach((statusBarTerminal, i) => {
+      terminals[i].setTerminalIndex(i);
+  });
+  terminalCount--;
 }
