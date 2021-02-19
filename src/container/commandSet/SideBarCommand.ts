@@ -5,7 +5,7 @@ import * as vscode from 'vscode'
 import { PREFIX } from '../../constants'
 import { FolderType, ShellType } from '../../type/common'
 import { isExist, read, getShellFromScripts } from '../../utils/package'
-import { SideBarEntryItem, SideBarEntryListImplements,} from '../../factory/SideBar'
+import { SideBarEntryItem, SideBarEntryListImplements } from '../../factory/SideBar'
 
 function getNode(
   title: string,
@@ -14,8 +14,8 @@ function getNode(
 ) {
   let node = new SideBarEntryItem(title, vscode.TreeItemCollapsibleState.None, description)
   node.command = {
-    command: 'BeeHive-Command.openChild', //命令id
     title: title,
+    command: 'BeeHive-Command.openChild', //命令id
     arguments: [{ title, ...args }], //命令接收的参数
   }
   return node
@@ -25,9 +25,7 @@ export default class SideBarCommand extends SideBarEntryListImplements {
   constructor(private folderPathList: FolderType[] | undefined) {
     super()
   }
-  getChildren(
-    element: SideBarEntryItem | undefined
-  ): vscode.ProviderResult<SideBarEntryItem[]> {
+  getChildren(element: SideBarEntryItem | undefined): vscode.ProviderResult<SideBarEntryItem[]> {
     if (element) {
       var childrenList: any = []
       if (isExist(`${element.path}/package.json`)) {
@@ -42,15 +40,15 @@ export default class SideBarCommand extends SideBarEntryListImplements {
               childrenList[index] = node
             })
           } else {
-            const noneNode = getNode(`[${PREFIX}]: scripts 脚本命令不符合规则`)
+            const noneNode = getNode(`[${PREFIX}]: 😥 script command does not meet the rules`)
             childrenList = [noneNode]
           }
         } else {
-          const noneNode = getNode(`[${PREFIX}]: 不存在 scripts 脚本命令`)
+          const noneNode = getNode(`[${PREFIX}]: 😞 no script commands`)
           childrenList = [noneNode]
         }
       } else {
-        const noneNode = getNode(`[${PREFIX}]: 工程项目不存在package.json`)
+        const noneNode = getNode(`[${PREFIX}]: 😅 project does not exist package.json`)
         childrenList = [noneNode]
       }
       return childrenList

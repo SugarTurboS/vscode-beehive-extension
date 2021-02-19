@@ -1,4 +1,11 @@
-export const PREFIX = `BeeHive`
+export const PREFIX = 'beehive'
+
+export const MATCH_CONFIG_MAPS = {
+  LOW: 'lowMatch', // 低配
+  MIDDLE: 'middleMatch', // 中配
+  HIGH: 'highMatch' // 高配
+}
+
 export const RUN_ENVIRONMENT = ['dev', 'test', 'test-1', 'test-2', 'prod']
 
 export const RUN_ENVIRONMENT_MAPS: { [key: string]: any } = {

@@ -17,6 +17,22 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "vscode-beehive-extension",
+      "properties": {
+        "vscode-beehive-extension.matchConfig": {
+          "type": "string",
+          "description": "vscode-beehive 配置，默认低配版本",
+          "enum": [
+            "lowMatch",
+            "middleMatch",
+            "highMatch"
+          ],
+          "default": "lowMatch",
+          "scope": "window"
+        }
+      }
+    },
     "commands": [],
     "viewsWelcome": [
       {
