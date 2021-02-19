@@ -5,7 +5,7 @@ import * as vscode from 'vscode'
 import { PREFIX } from '../../constants'
 import { FolderType, ShellType } from '../../type/common'
 import { isExist, read, getShellFromScripts } from '../../utils/package'
-import { SideBarEntryItem, SideBarEntryListImplements } from '../../factory/SideBar'
+import { SideBarEntryItem, SideBarEntryListImplements } from '../../helper/SideBar'
 
 function getNode(
   title: string,
@@ -36,7 +36,11 @@ export default class SideBarCommand extends SideBarEntryListImplements {
           const shellList = [...webpackShell, ...eggShell]
           if (!!shellList.length) {
             shellList.forEach((shell: ShellType, index: number) => {
-              const node = getNode(shell.key, `[${shell.environment}]`, { shell, path: element.path })
+              const node = getNode(shell.key, `[${shell.environment}]`, {
+                shell,
+                path: element.path,
+                projectName: element.projectName,
+              })
               childrenList[index] = node
             })
           } else {
@@ -58,6 +62,7 @@ export default class SideBarCommand extends SideBarEntryListImplements {
           folder.name,
           vscode.TreeItemCollapsibleState.Collapsed,
           '',
+          folder.name,
           folder.path
         )
       })
