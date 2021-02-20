@@ -22,13 +22,25 @@
       "properties": {
         "vscode-beehive-extension.matchConfig": {
           "type": "string",
-          "description": "vscode-beehive 配置，默认低配版本",
+          "description": "vscode-beehive 版本配置，默认低配版本",
           "enum": [
             "lowMatch",
             "middleMatch",
             "highMatch"
           ],
           "default": "lowMatch",
+          "scope": "window"
+        },
+        "vscode-beehive-extension.splitTerminal": {
+          "type": "boolean",
+          "description": "是否支持分割终端",
+          "default": false,
+          "scope": "window"
+        },
+        "vscode-beehive-extension.autoRunTerminal": {
+          "type": "boolean",
+          "description": "是否自动运行脚本",
+          "default": false,
           "scope": "window"
         }
       }
