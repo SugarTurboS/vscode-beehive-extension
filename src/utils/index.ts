@@ -42,4 +42,30 @@ function getExtensionInfo(): VscodeExtensionType {
   return extensionInfo
 }
 
-export { getWorkSpaceFolderList, getExtensionInfo }
+/**
+ * @description 数组去重
+ * @param {Array} arr
+ * @param {string} iteratee
+ */
+function uniqBy(arr: any[], iteratee: string) {
+  return arr !== null && arr.length ? objUniq(arr, iteratee) : []
+}
+
+/**
+ * @description 去重
+ */
+function objUniq(arr: any[], iteratee: string) {
+  let uniqMaps: { [key: string]: any } = {}
+  arr.forEach((ele: { [key: string]: any }, index: number) => {
+    if (!uniqMaps[ele[iteratee]]) {
+      // 默认采用第一个出现的数据为准
+      uniqMaps[ele[iteratee]] = index
+    }
+  })
+  const result = Object.keys(uniqMaps).map((key: string) => {
+    return arr[uniqMaps[key]]
+  })
+  return result
+}
+
+export { getWorkSpaceFolderList, getExtensionInfo, uniqBy }
