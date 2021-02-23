@@ -1,3 +1,4 @@
+import * as os from 'os'
 import * as vscode from 'vscode'
 import { read, isExist } from './package'
 import { FolderType, VscodeExtensionType } from '../type/common'
@@ -17,6 +18,27 @@ function getWorkSpaceFolderList() {
   })
 
   return folderList
+}
+
+/**
+ * @description 获取操作系统平台
+ */
+function isWinOS() {
+  return os.platform() === 'win32'
+}
+
+function isMacOS() {
+  return os.platform() === 'darwin'
+}
+
+/**
+ *@description 得到正确的地址，兼容window上的问题
+ */
+function getPath(filePath: string) {
+  if (isWinOS()) {
+    return filePath.replace('/c:', 'C:')
+  }
+  return filePath
 }
 
 /**
@@ -68,4 +90,11 @@ function objUniq(arr: any[], iteratee: string) {
   return result
 }
 
-export { getWorkSpaceFolderList, getExtensionInfo, uniqBy }
+export {
+  isMacOS,
+  isWinOS,
+  getPath,
+  getWorkSpaceFolderList,
+  getExtensionInfo,
+  uniqBy,
+}

@@ -2,7 +2,7 @@
   "name": "vscode-beehive-extension",
   "displayName": "vscode-beehive-extension",
   "description": "SugarTurboS 开发针对项目命令规范及脚本运行的辅助工具～",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "pengdaokuan",
   "icon": "assets/logo.png",
   "engines": {
@@ -12,7 +12,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:BeeHive-Command"
+    "onView:BeeHive-Command",
+    "onCommand: BeeHive-Command.refresh"
   ],
   "repository": {
     "type": "git",
@@ -58,7 +59,24 @@
         }
       }
     },
-    "commands": [],
+    "commands": [
+      {
+        "command": "BeeHive-Command.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "assets/refresh.svg",
+          "dark": "assets/refresh.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "BeeHive-Command.refresh",
+          "group": "navigation"
+        }
+      ]
+    },
     "viewsWelcome": [
       {
         "view": "BeeHive-Command",
@@ -70,14 +88,14 @@
         {
           "id": "sugar",
           "title": "Sugar-BeeHive",
-          "icon": "./assets/logo_default.svg"
+          "icon": "assets/logo_bar.svg"
         }
       ],
       "panel": [
         {
           "id": "sugar",
           "title": "Package Explorer",
-          "icon": "./assets/logo_default.svg"
+          "icon": "assets/logo_bar.svg"
         }
       ]
     },
