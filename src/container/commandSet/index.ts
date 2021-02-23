@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
 import SideBarCommand from './SideBarCommand'
-import { MyTerminalOptions, ShellType } from '../../type/common'
-import { uniqBy, getWorkSpaceFolderList } from '../../utils'
 import { PREFIX, MATCH_CONFIG_MAPS } from '../../constants'
+import { MyTerminalOptions, ShellType } from '../../type/common'
+import { getPath, uniqBy, getWorkSpaceFolderList } from '../../utils'
 import { StatusBarTerminal } from './StatusBarTerminal'
 
 const MAX_TERMINALS = 10
@@ -11,11 +11,20 @@ let terminalIndex: number
 let terminals: StatusBarTerminal[] = []
 
 module.exports = function (context: vscode.ExtensionContext) {
+  init(context)
+  let reloadExtensionCommand = vscode.commands.registerCommand('BeeHive-Command.refresh', () => {
+    vscode.commands.executeCommand('workbench.action.reloadWindow')
+  })
+  context.subscriptions.push(reloadExtensionCommand)
+}
+
+function init(context: vscode.ExtensionContext) {
   // 得到vscode所有工程项目
   const folderList = getWorkSpaceFolderList()
 
   // 注册侧边栏面板
   const sideBar = new SideBarCommand(folderList)
+
   vscode.window.registerTreeDataProvider('BeeHive-Command', sideBar)
 
   // 注册命令
@@ -30,7 +39,7 @@ module.exports = function (context: vscode.ExtensionContext) {
         // 获取用户配置的beehive版本设置
         const matchConfig = vscode.workspace.getConfiguration().get('vscode-beehive-extension.matchConfig') || MATCH_CONFIG_MAPS.LOW
         // 获取用户配置的是否分割终端设置
-        const splitTerminal = vscode.workspace.getConfiguration().get('vscode-beehive-extension.splitTerminal') || false;
+        const splitTerminal = vscode.workspace.getConfiguration().get('vscode-beehive-extension.splitTerminal') || false
         // 获取用户配置的是否自动运行脚本
         const autoRunTerminal: boolean = vscode.workspace.getConfiguration().get('vscode-beehive-extension.autoRunTerminal') || false
 
@@ -46,11 +55,11 @@ module.exports = function (context: vscode.ExtensionContext) {
           }
           terminals.push(
             new StatusBarTerminal(terminalCount++, {
-              terminalCwd: path,
+              terminalCwd: getPath(path),
               terminalName: projectName,
               terminalText: `npm run ${shell?.key}`,
               terminalAutoInputText: true,
-              terminalAutoRun: autoRunTerminal
+              terminalAutoRun: autoRunTerminal,
             })
           )
           context.subscriptions.push(vscode.window.onDidCloseTerminal(onDidCloseTerminal))
@@ -64,11 +73,11 @@ module.exports = function (context: vscode.ExtensionContext) {
           if (!currentProjectTerminal) {
             terminals.push(
               new StatusBarTerminal(terminalCount++, {
-                terminalCwd: path,
+                terminalCwd: getPath(path),
                 terminalName: projectName,
                 terminalText: `npm run ${shell?.key}`,
                 terminalAutoInputText: true,
-                terminalAutoRun: autoRunTerminal
+                terminalAutoRun: autoRunTerminal,
               })
             )
           }
@@ -78,21 +87,21 @@ module.exports = function (context: vscode.ExtensionContext) {
             if (!splitTerminal) {
               terminals.push(
                 new StatusBarTerminal(terminalCount++, {
-                  terminalCwd: path,
+                  terminalCwd: getPath(path),
                   terminalName: projectName,
                   terminalText: `npm run ${shell?.key}`,
                   terminalAutoInputText: true,
-                  terminalAutoRun: autoRunTerminal
+                  terminalAutoRun: autoRunTerminal,
                 })
               )
             } else {
               currentProjectTerminal?.show()
               await createNewSplitTerminal(terminalCount++, {
-                terminalCwd: path,
+                terminalCwd: getPath(path),
                 terminalName: projectName,
                 terminalText: `npm run ${shell?.key}`,
                 terminalAutoInputText: true,
-                terminalAutoRun: autoRunTerminal
+                terminalAutoRun: autoRunTerminal,
               })
             }
           }
@@ -122,7 +131,10 @@ function onDidCloseTerminal(terminal: vscode.Terminal): void {
 }
 
 // 创建分割拆分终端
-async function createNewSplitTerminal(terminalIndex: number, terminalOptions: MyTerminalOptions): Promise<vscode.Terminal> {
+async function createNewSplitTerminal(
+  terminalIndex: number,
+  terminalOptions: MyTerminalOptions
+): Promise<vscode.Terminal> {
   return new Promise(async () => {
     // 通过命令创建的终端是默认的终端信息，暂未发现此命令可以通过传参配置生成的命令
     // 解决方案就是构造一个StatusBarTerminal实例，再updateTerminal
