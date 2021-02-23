@@ -1,16 +1,29 @@
 {
   "name": "vscode-beehive-extension",
   "displayName": "vscode-beehive-extension",
-  "description": "beehive版本的vscode插件",
-  "version": "0.0.1",
+  "description": "SugarTurboS 开发针对项目命令规范及脚本运行的辅助工具～",
+  "version": "0.0.2",
+  "publisher": "pengdaokuan",
+  "icon": "assets/logo.png",
   "engines": {
-    "vscode": "^1.53.0"
+    "vscode": "^1.42.0"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
     "onView:BeeHive-Command"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SugarTurboS/vscode-beehive-extension.git"
+  },
+  "keywords": [
+    "vscode",
+    "extension",
+    "beehive",
+    "command",
+    "scripts"
   ],
   "author": {
     "name": "彭道宽"
@@ -22,25 +35,25 @@
       "properties": {
         "vscode-beehive-extension.matchConfig": {
           "type": "string",
-          "description": "vscode-beehive 版本配置，默认低配版本",
+          "description": "vscode-beehive 版本配置，默认高配版本",
           "enum": [
             "lowMatch",
             "middleMatch",
             "highMatch"
           ],
-          "default": "lowMatch",
+          "default": "highMatch",
           "scope": "window"
         },
         "vscode-beehive-extension.splitTerminal": {
           "type": "boolean",
-          "description": "是否支持分割终端",
-          "default": false,
+          "description": "是否支持分割终端，默认支持",
+          "default": true,
           "scope": "window"
         },
         "vscode-beehive-extension.autoRunTerminal": {
           "type": "boolean",
-          "description": "是否自动运行脚本",
-          "default": false,
+          "description": "是否自动运行脚本，默认自动运行",
+          "default": true,
           "scope": "window"
         }
       }
@@ -73,10 +86,6 @@
         {
           "id": "BeeHive-Command",
           "name": "01.命令集"
-        },
-        {
-          "id": "BeeHive-Package",
-          "name": "02.包分析"
         }
       ]
     }
@@ -93,7 +102,7 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.53.0",
+    "@types/vscode": "^1.42.0",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.4",
     "@types/node": "^12.11.7",
