@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
 import SideBarCommand from './SideBarCommand'
+import { StatusBarTerminal } from './StatusBarTerminal'
 import { PREFIX, MATCH_CONFIG_MAPS } from '../../constants'
 import { MyTerminalOptions, ShellType } from '../../type/common'
-import { getPath, uniqBy, getWorkSpaceFolderList } from '../../utils'
-import { StatusBarTerminal } from './StatusBarTerminal'
+import { getPathHack, uniqBy, getWorkSpaceFolders } from '../../utils'
 
 const MAX_TERMINALS = 10
 let terminalCount = 0
@@ -20,7 +20,7 @@ module.exports = function (context: vscode.ExtensionContext) {
 
 function init(context: vscode.ExtensionContext) {
   // 得到vscode所有工程项目
-  const folderList = getWorkSpaceFolderList()
+  const folderList = getWorkSpaceFolders()
 
   // 注册侧边栏面板
   const sideBar = new SideBarCommand(folderList)
@@ -55,7 +55,7 @@ function init(context: vscode.ExtensionContext) {
           }
           terminals.push(
             new StatusBarTerminal(terminalCount++, {
-              terminalCwd: getPath(path),
+              terminalCwd: getPathHack(path),
               terminalName: projectName,
               terminalText: `npm run ${shell?.key}`,
               terminalAutoInputText: true,
@@ -73,7 +73,7 @@ function init(context: vscode.ExtensionContext) {
           if (!currentProjectTerminal) {
             terminals.push(
               new StatusBarTerminal(terminalCount++, {
-                terminalCwd: getPath(path),
+                terminalCwd: getPathHack(path),
                 terminalName: projectName,
                 terminalText: `npm run ${shell?.key}`,
                 terminalAutoInputText: true,
@@ -87,7 +87,7 @@ function init(context: vscode.ExtensionContext) {
             if (!splitTerminal) {
               terminals.push(
                 new StatusBarTerminal(terminalCount++, {
-                  terminalCwd: getPath(path),
+                  terminalCwd: getPathHack(path),
                   terminalName: projectName,
                   terminalText: `npm run ${shell?.key}`,
                   terminalAutoInputText: true,
@@ -97,7 +97,7 @@ function init(context: vscode.ExtensionContext) {
             } else {
               currentProjectTerminal?.show()
               await createNewSplitTerminal(terminalCount++, {
-                terminalCwd: getPath(path),
+                terminalCwd: getPathHack(path),
                 terminalName: projectName,
                 terminalText: `npm run ${shell?.key}`,
                 terminalAutoInputText: true,

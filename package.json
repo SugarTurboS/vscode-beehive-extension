@@ -2,7 +2,7 @@
   "name": "vscode-beehive-extension",
   "displayName": "vscode-beehive-extension",
   "description": "SugarTurboS 开发针对项目命令规范及脚本运行的辅助工具～",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "pengdaokuan",
   "icon": "assets/logo.png",
   "engines": {
@@ -36,7 +36,7 @@
       "properties": {
         "vscode-beehive-extension.matchConfig": {
           "type": "string",
-          "description": "vscode-beehive 版本配置，默认高配版本",
+          "description": "beehive 版本配置，默认高配版本",
           "enum": [
             "lowMatch",
             "middleMatch",
@@ -55,6 +55,12 @@
           "type": "boolean",
           "description": "是否自动运行脚本，默认自动运行",
           "default": true,
+          "scope": "window"
+        },
+        "vscode-beehive-extension.scriptsRule": {
+          "type": "string",
+          "description": "脚本命令规范，根据您的配置，从 scripts 中读取匹配的脚本数据～\n请注意，必须以 、分割，建议规则设置为：[类型][:]",
+          "default": "webpack:、server:",
           "scope": "window"
         }
       }

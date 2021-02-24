@@ -1,20 +1,25 @@
 import * as fs from 'fs'
-import { getPath } from './index'
+import { getPathHack } from './index'
 import { ShellType } from '../type/common'
 import { RUN_ENVIRONMENT, RUN_ENVIRONMENT_MAPS } from '../constants'
+import { env } from 'process'
 
 /**
  * @description 读取 package.json 内容
  */
-function read(filePath: string) {
-  const realPath = getPath(filePath)
+function readFile(filePath: string) {
+  const realPath = getPathHack(filePath)
   return JSON.parse(fs.readFileSync(realPath, 'utf-8'))
 }
 
-function hasPackageJson(filePath: string) {
+/**
+ * @description 文件是否可读
+ * @param filePath 项目路径
+ */
+function canReadFile(filePath: string) {
   return new Promise((resolve, reject) => {
-    const realPath = getPath(filePath)
-    fs.access(realPath, fs.constants.F_OK, (err: any) => {
+    const realPath = getPathHack(filePath)
+    fs.access(realPath, fs.constants.F_OK, (err) => {
       if (err) {
         reject(false)
       } else {
@@ -25,12 +30,33 @@ function hasPackageJson(filePath: string) {
 }
 
 /**
+ * @description 匹配脚本环境
+ * @param shellEnv 脚本环境
+ */
+function getShellEnv(shellEnv: string): string {
+  let canBreak = false
+  let environment: string = RUN_ENVIRONMENT_MAPS.unknown
+  if (shellEnv) {
+    RUN_ENVIRONMENT.map((env: string) => {
+      const reg = new RegExp(`${env}`)
+      if (reg.test(shellEnv)) {
+        if (!canBreak) {
+          canBreak = true
+          environment = RUN_ENVIRONMENT_MAPS[env]
+        }
+      }
+    })
+  }
+  return environment
+}
+
+/**
  * @description 判断 package.json 文件是否存在
  * @param {string} projectPath 项目地址
  */
-async function isExist(projectPath: string) {
+async function hasFile(projectPath: string) {
   try {
-    return await hasPackageJson(projectPath)
+    return await canReadFile(projectPath)
   } catch (err) {
     return false
   }
@@ -41,22 +67,24 @@ async function isExist(projectPath: string) {
  * @param {string} shellKey scripts 中的 key
  * @param {ShellType} scripts package.json 中的 scripts 数据
  */
-function getShellFromScripts(
-  scripts: { [key: string]: string },
-  shellKey: string
-): ShellType[] {
+interface KeyType {
+  [key: string]: string
+}
+function getShell(scripts: KeyType, shellKey: string): ShellType[] {
   if (!scripts || Object.keys(scripts).length === 0) {
     return []
   }
   let shellList: ShellType[] = []
-  const reg = new RegExp(`${shellKey}:`)
+  const reg = new RegExp(`${shellKey}`)
   Object.keys(scripts).map((scriptName: string) => {
     if (reg.test(scriptName)) {
-      const _env = scriptName.split(':')[1]
-      const environment =
-        _env && RUN_ENVIRONMENT.includes(_env)
-          ? RUN_ENVIRONMENT_MAPS[_env]
-          : RUN_ENVIRONMENT_MAPS.unknown
+      let environment: string = ''
+      try {
+        let shellEnv = scriptName.split(':')[1]
+        environment = getShellEnv(shellEnv)
+      } catch (err) {
+        environment = RUN_ENVIRONMENT_MAPS.unknown
+      }
       shellList.push({
         key: scriptName,
         value: scripts[`${scriptName}`],
@@ -67,4 +95,4 @@ function getShellFromScripts(
   return shellList
 }
 
-export { read, isExist, getShellFromScripts }
+export { readFile, hasFile, getShell }

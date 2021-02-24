@@ -2,9 +2,10 @@
  * @description 命令集侧边栏实例
  */
 import * as vscode from 'vscode'
+import { trim } from '../../utils'
 import { PREFIX } from '../../constants'
 import { FolderType, ShellType } from '../../type/common'
-import { isExist, read, getShellFromScripts } from '../../utils/package'
+import { hasFile, readFile, getShell } from '../../utils/package'
 import { SideBarEntryItem, SideBarEntryListImplements } from '../../helper/SideBar'
 
 function getNode(
@@ -12,7 +13,11 @@ function getNode(
   description?: string,
   args?: { [key: string]: any }
 ) {
-  let node = new SideBarEntryItem(title, vscode.TreeItemCollapsibleState.None, description)
+  let node = new SideBarEntryItem(
+    title,
+    vscode.TreeItemCollapsibleState.None,
+    description
+  )
   node.command = {
     title: title,
     command: 'BeeHive-Command.openChild', //命令id
@@ -27,13 +32,21 @@ export default class SideBarCommand extends SideBarEntryListImplements {
   }
   getChildren(element: SideBarEntryItem | undefined): vscode.ProviderResult<SideBarEntryItem[]> {
     if (element) {
-      var childrenList: any = []
-      if (isExist(`${element.path}/package.json`)) {
-        const packageValues = read(`${element.path}/package.json`)
+      var childElement: any = []
+      if (hasFile(`${element.path}/package.json`)) {
+        const packageValues = readFile(`${element.path}/package.json`)
         if (packageValues && packageValues.scripts) {
-          const eggShell = getShellFromScripts(packageValues.scripts, 'server')
-          const webpackShell = getShellFromScripts(packageValues.scripts, 'webpack')
-          const shellList = [...webpackShell, ...eggShell]
+          // 得到用户自定义配置的脚本命令规则
+          const scriptsRule: string = vscode.workspace.getConfiguration().get('vscode-beehive-extension.scriptsRule') || ''
+          const scriptNames = scriptsRule.split('、')
+
+          const shellList: ShellType[] = []
+          scriptNames.map((scriptName: string) => {
+            if (scriptName) {
+              const scripts = getShell(packageValues.scripts, trim(scriptName))
+              if (!!scripts.length) scripts.map((s) => shellList.push(s))
+            }
+          })
           if (!!shellList.length) {
             shellList.forEach((shell: ShellType, index: number) => {
               const node = getNode(shell.key, `[${shell.environment}]`, {
@@ -41,21 +54,21 @@ export default class SideBarCommand extends SideBarEntryListImplements {
                 path: element.path,
                 projectName: element.projectName,
               })
-              childrenList[index] = node
+              childElement[index] = node
             })
           } else {
             const noneNode = getNode(`[${PREFIX}]: 😥 script command does not meet the rules`)
-            childrenList = [noneNode]
+            childElement = [noneNode]
           }
         } else {
           const noneNode = getNode(`[${PREFIX}]: 😞 no script commands`)
-          childrenList = [noneNode]
+          childElement = [noneNode]
         }
       } else {
         const noneNode = getNode(`[${PREFIX}]: 😅 project does not exist package.json`)
-        childrenList = [noneNode]
+        childElement = [noneNode]
       }
-      return childrenList
+      return childElement
     } else {
       const folderNode = this.folderPathList?.map((folder: FolderType) => {
         return new SideBarEntryItem(
