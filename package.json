@@ -2,7 +2,7 @@
   "name": "vscode-beehive-extension",
   "displayName": "vscode-beehive-extension",
   "description": "SugarTurboS 开发针对项目命令规范及脚本运行的辅助工具～",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "pengdaokuan",
   "icon": "assets/logo.png",
   "engines": {
