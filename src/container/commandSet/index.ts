@@ -13,7 +13,7 @@ let terminals: StatusBarTerminal[] = []
 module.exports = function (context: vscode.ExtensionContext) {
   init(context)
   let reloadExtensionCommand = vscode.commands.registerCommand('BeeHive-Command.refresh', () => {
-    vscode.commands.executeCommand('workbench.action.reloadWindow')
+    vscode.commands.executeCommand('workbench.action.restartExtensionHost')
   })
   context.subscriptions.push(reloadExtensionCommand)
 }

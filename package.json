@@ -79,7 +79,8 @@
       "view/title": [
         {
           "command": "BeeHive-Command.refresh",
-          "group": "navigation"
+          "group": "navigation",
+          "when": "view == BeeHive-Command"
         }
       ]
     },
@@ -94,13 +95,6 @@
         {
           "id": "sugar",
           "title": "Sugar-BeeHive",
-          "icon": "assets/logo_bar.svg"
-        }
-      ],
-      "panel": [
-        {
-          "id": "sugar",
-          "title": "Package Explorer",
           "icon": "assets/logo_bar.svg"
         }
       ]
